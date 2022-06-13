@@ -14,7 +14,7 @@ variable "zone" {
 }
 
 variable "key_name" {
-  default = "cloudiac-sample"
+  default = "cloudiac-ecs"
 }
 
 variable "public_key" {

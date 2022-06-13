@@ -6,11 +6,6 @@ data "alicloud_zones" "default" {
  available_disk_category = "cloud_efficiency"
  available_resource_creation = "VSwitch"
 }
-# SSH key pair
-resource "alicloud_ecs_key_pair" "default" {
-  key_pair_name = var.key_name
-  public_key    = var.public_key
-}
 # 安全组
 resource "alicloud_security_group" "group" {
     name = "tf_ecs_test_security_group"
@@ -28,7 +23,7 @@ resource "alicloud_vswitch" "vswitch" {
     zone_id = data.alicloud_zones.default.zones[0].id
     vswitch_name = var.name
 }
-// 键值对
+// 密钥对
 resource "alicloud_ecs_key_pair" "publickey" {
   key_pair_name = var.key_name
   public_key    = var.public_key
@@ -58,10 +53,23 @@ resource "alicloud_instance" "web" {
     # 交换机id 
     vswitch_id = alicloud_vswitch.vswitch.id
     # 峰值带宽
-    internet_max_bandwidth_out = 3
+    internet_max_bandwidth_out = 0
     # 数量
     count = var.instance_number
 }
+
+
+// 使用弹性IP
+resource "alicloud_eip_address" "eip" {
+}
+
+// 关联弹性IP到实例
+resource "alicloud_eip_association" "eip_asso" {
+  allocation_id = alicloud_eip_address.eip.id
+  count = var.instance_number
+  instance_id = alicloud_instance.web[count.index].id
+}
+
 
 # ansible_host
 resource "ansible_host" "web" {
@@ -75,15 +83,4 @@ resource "ansible_host" "web" {
   vars = {
     wait_connection_timeout = 600
   }
-}
-
-// 使用弹性IP
-resource "alicloud_eip_address" "eip" {
-}
-
-// 关联弹性IP到实例
-resource "alicloud_eip_association" "eip_asso" {
-  allocation_id = alicloud_eip_address.eip.id
-  count = var.instance_number
-  instance_id = alicloud_instance.web[count.index].id
 }

@@ -10,13 +10,13 @@ variable "region" {
 }
 
 variable "zone" {
-  default = "cn-beijing-a"
+  default = "cn-beijing"
 
 }
 
 
 variable "instance_type" {
-  default = "ecs.t5-lc2m1.nano"
+  default = "ecs.g7.large"
   description = "实例规格"
 }
 variable "key_name" {

@@ -46,7 +46,7 @@ resource "alicloud_instance" "web" {
     // 安全组
     security_groups  = alicloud_security_group.group.*.id
     // 实例类型
-    instance_type = "ecs.t5-c1m1.xlarge"
+    instance_type = var.instance_type
     # 系统盘类型
     system_disk_category  = "cloud_efficiency"
     system_disk_name   = "test_ecs_disk"

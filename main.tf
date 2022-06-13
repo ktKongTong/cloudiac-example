@@ -24,7 +24,7 @@ resource "alicloud_vswitch" "vswitch" {
     vswitch_name = var.name
 }
 // 密钥对
-resource "alicloud_ecs_key_pair" "publickey" {
+resource "alicloud_ecs_key_pair" "default" {
   key_pair_name = var.key_name
   public_key    = var.public_key
 }

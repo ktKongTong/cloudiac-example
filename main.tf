@@ -8,7 +8,7 @@ data "alicloud_zones" "default" {
 }
 # 安全组
 resource "alicloud_security_group" "group" {
-    name = "tf_ecs_test_security_group"
+    name = var.sg_name
     vpc_id = alicloud_vpc.vpc.id
 }
 # 安全组规则
@@ -51,9 +51,9 @@ resource "alicloud_instance" "web" {
     system_disk_category  = "cloud_efficiency"
     system_disk_name   = "test_ecs_disk"
     # 镜像id 
-    image_id = "centos_7_6_x64_20G_alibase_20211130.vhd"
+    image_id = var.image_id
     # 实例名称 
-    instance_name = "ali-test-1"
+    instance_name = var.instance_name
     # 计费方式，后付费
     instance_charge_type = "PostPaid"
     # 计费策略，按量付费

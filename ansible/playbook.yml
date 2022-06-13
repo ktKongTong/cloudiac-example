@@ -18,6 +18,12 @@
       delay: 5
       register: ensure_nginx
       until: ensure_nginx is success
+    
+    - name: Create /var/www/html
+      file:
+        path: /var/www/html
+        state: directory
+      become: yes
 
     - name: Copy index.html
       copy:

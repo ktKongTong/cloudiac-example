@@ -11,6 +11,17 @@ resource "alicloud_security_group" "group" {
     name = "tf_ecs_test_security_group"
     vpc_id = alicloud_vpc.vpc.id
 }
+# 安全组规则
+resource "alicloud_security_group_rule" "allow_all_tcp" {
+  type              = "ingress"
+  ip_protocol       = "tcp"
+  nic_type          = "intranet"
+  policy            = "accept"
+  port_range        = "1/65535"
+  priority          = 1
+  security_group_id = alicloud_security_group.default.id
+  cidr_ip           = "0.0.0.0/0"
+}
 # VPC
 resource "alicloud_vpc" "vpc" {
     vpc_name = var.name

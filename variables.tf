@@ -16,7 +16,7 @@ variable "zone" {
 
 
 variable "instance_type" {
-  default = "ecs.t5-lc1m1.small"
+  default = "ecs.t5-lc2m1.nano"
   description = "实例规格"
 }
 variable "key_name" {

@@ -1,9 +1,3 @@
-variable "access_key" {
-    default = "LTAI5tC8kzLhsN1Hnd392e6g"
-}
-variable "secret_key" {
-    default = "lYm6HRyrf4cprRSzlNnitAAXTlcj8M"
-}
 variable "name" {
  default = "auto_provisioning_group"
 }

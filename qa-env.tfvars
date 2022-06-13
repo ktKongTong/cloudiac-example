@@ -1,5 +1,5 @@
 # 测试环境配置
-zone = "cn-beijing"
+zone = "cn-beijing-k"
 instance_type = "ecs.s6-c1m1.small"
 instance_name = "cloudiac-example-qa"
 vpc_name = "vpc-cloudiac-example-qa"

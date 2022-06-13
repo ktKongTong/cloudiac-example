@@ -16,7 +16,7 @@ variable "zone" {
 
 
 variable "instance_type" {
-  default = "	ecs.s6-c1m1.small"
+  default = "ecs.s6-c1m1.small"
   description = "实例规格"
 }
 variable "key_name" {

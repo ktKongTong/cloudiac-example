@@ -81,6 +81,6 @@ resource "ansible_host" "web" {
   groups = ["web"]
   // 传给 ansible 的 vars，可在 playbook 文件中引用
   vars = {
-    wait_connection_timeout = 600
+    wait_connection_timeout = 120
   }
 }

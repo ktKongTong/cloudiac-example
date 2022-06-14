@@ -14,7 +14,7 @@
       5: PHP 7.3\n
       6: PHP 7.4\n"
       private: no
-      default: 4
+      default: 6
 
     - name: 'mysql_selection'
       prompt: "\nChoose serial number to install MySQL \n\n
@@ -23,14 +23,14 @@
       3: MySQL 5.7\n
       4: MySQL 8.0\n"
       private: no
-      default: 3
+      default: 4
 
     - name: 'java_selection'
       prompt: "\nDo you want to install Java and Tomcat with LNMP? \n\n
       1: No, I don't want to install them\n
       2: Yes)\n"
       private: no
-      default: 2
+      default: 1
 
   vars:
     mysql_select:

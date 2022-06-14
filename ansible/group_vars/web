@@ -1,0 +1,4 @@
+---
+wait_connection_timeout: "30"
+mysql_root_password: "Lxf121314!"
+nginx_target_path: "/var/www/html"

@@ -1,0 +1,62 @@
+---
+- name: Wait connection
+  wait_for_connection:
+    sleep: 1
+    timeout: "30"
+- name: Ensure mysql is at the latest version
+  package:
+    name: mysql-community-server
+    state: latest
+  # become: yes
+  ignore_errors: true
+  register: ensure_mysql
+  # 通知handlers安装mysql
+- name: Install mysql
+  shell: "echo"
+  when: ensure_mysql.rc!=0
+  notify: install mysql
+  
+- meta: flush_handlers
+
+# 添加配置文件
+- name: Add .my.cnf to user home
+  template:
+    src: ../templates/my.cnf.j2
+    dest: /etc/my.cnf
+# 启动mysql
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+- name: Start mysql
+  service:
+    name: mysqld
+    state: started
+  # become: yes
+# 获取并修改临时密码
+- name: Catch temporary password And update expired root user password
+  block:
+    - shell: "grep 'A temporary password is generated for root@localhost' /var/log/mysqld.log | awk -F ' ' '{print $(NF)}'"
+      register: root_password
+    - command: mysql --user root --password={{ root_password.stdout }} --connect-expired-password --execute="ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '{{ mysql_root_password }}';"
+
+- name: ChangeRoot
+  mysql_user:
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    name: "root"
+    password: "{{ mysql_root_password }}"
+    priv: '*.*:ALL,GRANT'
+    state: present
+    host: '%'
+- name: ChangeUser
+  mysql_user:
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    name: "user"
+    password: "{{ mysql_root_password }}"
+    priv: '*.*:ALL,GRANT'
+    state: present
+    host: '%'
+
+- name: FLUSH PRIVILEGES
+  command: mysql --user root --password={{ mysql_root_password }} --connect-expired-password --execute="FLUSH PRIVILEGES;"

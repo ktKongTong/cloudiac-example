@@ -1,0 +1,11 @@
+---
+- name: Install LNMP
+  hosts: web
+  remote_user: root
+  gather_facts: false
+  become: true
+
+  roles:
+    - mysql
+    - nginx
+    - php

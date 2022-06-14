@@ -1,0 +1,44 @@
+    ## 机器创建需要一段时间，所以先尝试连接, 确保连接可用再执行后续操作
+    - name: Wait connection
+      ## 每秒尝试进行一次连接直到连接成功或者超时
+      wait_for_connection:
+        sleep: 1
+        timeout: "30"
+
+    - name: Ensure nginx is at the latest version
+      package:
+        name: nginx
+        state: latest
+      # become: yes
+      retries: 3
+      delay: 5
+      register: ensure_nginx
+      until: ensure_nginx is success
+
+    - name: create path
+      file:
+        path: /var/www/html
+        state: directory
+
+    - name: Copy index.html
+      template:
+        ## 使用相对路径访问本目录下的文件
+        src: ../templates/index.html.j2
+        dest: /var/www/html/index.html
+        mode: '0644'
+    - name: Copy index.php
+      copy:
+        ## 使用相对路径访问本目录下的文件
+        src: ../templates/index.php
+        dest: /var/www/html/index.php
+        mode: '0644'
+    - name: Copy nginx.conf
+      template:
+        src: ../templates/nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+        mode: '0644'
+    - name: Start nginx
+      service:
+        name: nginx
+        state: started
+      # become: yes

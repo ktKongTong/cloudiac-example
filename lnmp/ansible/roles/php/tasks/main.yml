@@ -1,21 +1,23 @@
 ---
+# 等待连接
 - name: Wait connection
   wait_for_connection:
     sleep: 1
     timeout: "30"
+# 复制仓库的rpm文件
 - name: copy RPM file
   copy:
     src: ../files/remi-release-7.rpm
     dest: ~/remi-release-7.rpm
-  # become: yes
   ignore_errors: true
+# 添加仓库
 - name: add repo
   yum:
     name: /root/remi-release-7.rpm
     state: present
 - name: add repo2
   shell: "yum-config-manager --enable remi-php74"
-
+# 安装php
 - name: install php
   yum:
     name:
@@ -23,12 +25,13 @@
     - php-fpm
     - php-mysqlnd
     state: latest
+# 移动配置文件
 - name: move www.conf
   copy:
     src: ../templates/www.conf
     dest: /etc/php-fpm.d/www.conf
+# 启动php-fpm
 - name: Start  php-fpm
   service:
     name: php-fpm
     state: started
-  # become: yes

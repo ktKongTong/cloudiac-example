@@ -4,11 +4,6 @@
     src: ../files/mysql80-community-release-el7-6.noarch.rpm
     dest: ~/mysql80-community-release-el7-6.noarch.rpm
   listen: install mysql
-# - name: copy GPG
-#   copy:
-#     src: ../files/key.gpg
-#     dest: ~/key.gpg
-#   listen: install mysql
 # 添加仓库
 - name: add Repo
   listen: install mysql
@@ -21,7 +16,6 @@
   ansible.builtin.rpm_key:
     state: present
     key: https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
-  # become: yes
   # 安装mysql
 - name : Install
   listen: install mysql
@@ -31,4 +25,3 @@
     - mysql-community-devel*
     - MySQL-python
     state: present
-  # become: yes

@@ -13,8 +13,6 @@ data "alicloud_security_groups" "default" {
 data "alicloud_instance_types" "default" {
   // 可用区
   availability_zone = data.alicloud_vswitches.default.vswitches.0.zone_id
-  cpu_core_count = 1
-  memory_size    = 2
 }
 # ECS
 resource "alicloud_instance" "instance" {

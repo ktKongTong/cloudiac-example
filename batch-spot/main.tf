@@ -3,7 +3,7 @@ provider "alicloud" {
 }
 
 data "alicloud_vswitches" "default" {
-  zone_id = "cn-beijing"
+  cidr_block = "192.168.0.0/24"
   vswitch_name = "slb-test"
 }
 data "alicloud_security_groups" "default" {

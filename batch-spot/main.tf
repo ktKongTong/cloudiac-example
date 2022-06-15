@@ -23,7 +23,7 @@ resource "alicloud_instance" "instance" {
     // 实例类型
     instance_type = data.alicloud_instance_types.default.ids.0
     // 安全组
-    security_groups  = data.alicloud_security_groups.default.groups.0.id
+    security_groups  = [data.alicloud_security_groups.default.groups.0.id]
     # 交换机id 
     vswitch_id = data.alicloud_vswitches.default.vswitches.0.id
     # 镜像id 

@@ -1,7 +1,12 @@
 variable "instance_number" {
   default = 3
 }
-
+variable "cpu_core_count" {
+  default = 1
+}
+variable "memory_size" {
+  default = 2
+}
 variable "key_name" {
   default = "cloudiac-ecs"
   description = "密钥对名称"

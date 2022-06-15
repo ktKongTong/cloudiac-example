@@ -1,97 +1,74 @@
+variable "profile" {
+  default = "default"
+}
+variable "region" {
+  default = "cn-hangzhou"
+}
 provider "alicloud" {
-    region  = "cn-beijing"
+  region  = var.region
+  profile = var.profile
 }
 
-data "alicloud_zones" "default" {
- available_disk_category = "cloud_efficiency"
- available_resource_creation = "VSwitch"
-}
-# 安全组
-resource "alicloud_security_group" "group" {
-    name = var.sg_name
-    vpc_id = alicloud_vpc.vpc.id
-}
-# 安全组规则
-resource "alicloud_security_group_rule" "allow_all_tcp" {
-  type              = "ingress"
-  ip_protocol       = "tcp"
-  nic_type          = "intranet"
-  policy            = "accept"
-  port_range        = "1/65535"
-  priority          = 1
-  security_group_id = alicloud_security_group.group.id
-  cidr_ip           = "0.0.0.0/0"
-}
-# VPC
-resource "alicloud_vpc" "vpc" {
-    vpc_name = var.name
-    cidr_block = "172.16.0.0/16"
-}
-# 交换机
-resource "alicloud_vswitch" "vswitch" {
-    vpc_id = alicloud_vpc.vpc.id
-    cidr_block = "172.16.0.0/24"
-    zone_id = var.zone
-    vswitch_name = var.name
-}
-// 密钥对
-resource "alicloud_ecs_key_pair" "default" {
-  key_pair_name = var.key_name
-  public_key    = var.public_key
-}
-# ECS
-resource "alicloud_instance" "web" {
-    // 可用区
-    availability_zone = var.zone
-    // 安全组
-    security_groups  = alicloud_security_group.group.*.id
-    // 实例类型
-    instance_type = var.instance_type
-    # 系统盘类型
-    system_disk_category  = "cloud_efficiency"
-    system_disk_name   = "test_ecs_disk"
-    # 镜像id 
-    image_id = var.image_id
-    # 实例名称 
-    instance_name = var.instance_name
-    # 计费方式，后付费
-    instance_charge_type = "PostPaid"
-    # 计费策略，按量付费
-    spot_strategy ="SpotAsPriceGo"
-    # 密码 
-    # password = "Lxf121314!"
-    key_name = alicloud_ecs_key_pair.default.key_name
-    # 交换机id 
-    vswitch_id = alicloud_vswitch.vswitch.id
-    # 峰值带宽
-    internet_max_bandwidth_out = 0
-    # 数量
-    count = var.instance_number
+variable "instances_number" {
+  default = 2
 }
 
-
-// 使用弹性IP
-resource "alicloud_eip_address" "eip" {
+##################################################################
+# Data sources to get VPC, subnet, security group and AMI details
+##################################################################
+data "alicloud_vpcs" "default" {
+  is_default = true
 }
 
-// 关联弹性IP到实例
-resource "alicloud_eip_association" "eip_asso" {
-  allocation_id = alicloud_eip_address.eip.id
-  count = var.instance_number
-  instance_id = alicloud_instance.web[count.index].id
+data "alicloud_vswitches" "all" {
+  vpc_id = data.alicloud_vpcs.default.ids.0
 }
 
+data "alicloud_images" "ubuntu" {
+  most_recent = true
+  name_regex  = "^ubuntu_18.*64"
+}
 
-# ansible_host
-resource "ansible_host" "web" {
-  count = var.instance_number
-  // 配置机器的 hostname，一般配置为计算资源的 public_ip (或 private_ip)
-  // inventory_hostname = alicloud_instance.web[count.index].public_ip
-  inventory_hostname = alicloud_eip_address.eip.ip_address
-  // 配置机器所属分组
-  groups = ["web"]
-  // 传给 ansible 的 vars，可在 playbook 文件中引用
-  vars = {
-    wait_connection_timeout = 120
-  }
+// retrieve 1c2g instance type
+data "alicloud_instance_types" "normal" {
+  availability_zone = data.alicloud_vswitches.all.vswitches.0.zone_id
+  cpu_core_count    = 1
+  memory_size       = 2
+}
+
+// Security Group module for ECS Module
+module "security_group" {
+  source  = "alibaba/security-group/alicloud"
+  profile = var.profile
+  region  = var.region
+  vpc_id  = data.alicloud_vpcs.default.ids.0
+  version = "~> 2.0"
+}
+
+module "ecs" {
+  source  = "../.."
+  profile = var.profile
+  region  = var.region
+
+  number_of_instances = var.instances_number
+
+  name                        = "example-with-eips"
+  image_id                    = data.alicloud_images.ubuntu.ids.0
+  instance_type               = data.alicloud_instance_types.normal.ids.0
+  vswitch_id                  = data.alicloud_vswitches.all.ids.0
+  security_group_ids          = [module.security_group.this_security_group_id]
+  associate_public_ip_address = false
+}
+
+resource "alicloud_eip_association" "this_ecs" {
+  count = var.instances_number
+
+  instance_id   = module.ecs.this_instance_id[count.index]
+  allocation_id = alicloud_eip.this[count.index].id
+}
+
+resource "alicloud_eip" "this" {
+  count = var.instances_number
+
+  bandwidth = 10
 }

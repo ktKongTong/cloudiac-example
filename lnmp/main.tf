@@ -56,7 +56,7 @@ resource "alicloud_instance" "web" {
     instance_name = var.instance_name
     # 计费方式，后付费
     instance_charge_type = "PostPaid"
-    # 计费策略，按量付费
+    # 计费策略，按量付费，竞价抢占
     spot_strategy ="SpotAsPriceGo"
     key_name = alicloud_ecs_key_pair.default.key_name
     # 交换机id 
@@ -74,7 +74,6 @@ resource "alicloud_eip_address" "eip" {
 // 关联弹性IP到实例
 resource "alicloud_eip_association" "eip_asso" {
   allocation_id = alicloud_eip_address.eip.id
-  count = var.instance_number
   instance_id = alicloud_instance.web[count.index].id
 }
 

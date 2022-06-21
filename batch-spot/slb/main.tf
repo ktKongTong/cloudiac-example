@@ -30,21 +30,21 @@ resource "alicloud_vswitch" "vswitch" {
     zone_id = "cn-beijing"
     vswitch_name = "slb-test"
 }
-#创建一个负载均衡实例（传统型）
-resource "alicloud_slb_load_balancer" "default" {
-  load_balancer_name = "spot-loadbalancer-test"
-  // 私网，之后绑定EIP
-  address_type       = "intranet"
-  load_balancer_spec = "slb.s1.small"
-  // 交换机
-  vswitch_id         = alicloud_vswitch.default.id
-}
+# #创建一个负载均衡实例（传统型）
+# resource "alicloud_slb_load_balancer" "default" {
+#   load_balancer_name = "spot-loadbalancer-test"
+#   // 私网，之后绑定EIP
+#   address_type       = "intranet"
+#   load_balancer_spec = "slb.s1.small"
+#   // 交换机
+#   vswitch_id         = alicloud_vswitch.default.id
+# }
 
-// 使用弹性IP
-resource "alicloud_eip_address" "eip" {
-}
-// 关联弹性IP到SLB
-resource "alicloud_eip_association" "eip_asso" {
-  allocation_id = alicloud_eip_address.eip.id
-  instance_id = alicloud_slb_load_balancer.default.id
-}
+# // 使用弹性IP
+# resource "alicloud_eip_address" "eip" {
+# }
+# // 关联弹性IP到SLB
+# resource "alicloud_eip_association" "eip_asso" {
+#   allocation_id = alicloud_eip_address.eip.id
+#   instance_id = alicloud_slb_load_balancer.default.id
+# }

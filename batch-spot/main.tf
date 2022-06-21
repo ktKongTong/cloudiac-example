@@ -29,7 +29,7 @@ resource "alicloud_instance" "instance" {
     # 镜像id 
     image_id = var.image_id
     # 实例名称 
-    instance_name = "example-with-eips"
+    instance_name = "slb-spot-test"
     # 计费方式，后付费
     instance_charge_type = "PostPaid"
     # 计费策略，按量付费，竞价抢占
